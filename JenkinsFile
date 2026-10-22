@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(
+            name: 'RUN_APP',
+            defaultValue: false,
+            description: 'Run calculator application'
+        )
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    sh 'mkdir -p dist'
+
+                    if (params.RUN_APP) {
+                        echo 'RUN APP=true'
+                        sh 'echo "Calculator app ran" > dist/calculator.txt'
+                    } else {
+                        echo 'RUN APP=false'
+                        sh 'echo "Calculator app skipped" > dist/calculator.txt'
+                    }
+                }
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts(
+                    artifacts: 'dist/**',
+                    fingerprint: true
+                )
+            }
+        }
+    }
+}
